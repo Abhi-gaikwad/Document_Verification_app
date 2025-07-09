@@ -106,10 +106,8 @@ def call_surepass_api(pan_number):
     """
     print(f"\n[DEBUG] Calling Surepass API for PAN: {pan_number}")
     # IMPORTANT: Ensure this URL matches your Surepass token's environment (sandbox or production)
-    # Using the production URL as a default suggestion based on previous error
-    url = "https://sandbox.surepass.io/api/v1/pan/pan-comprehensive" # Example: production URL
-    # If your token is for sandbox, use: url = "https://sandbox.surepass.io/api/v1/pan/pan" 
-    
+    url = "https://sandbox.surepass.io/api/v1/pan/pan-comprehensive" # This is the correct URL
+
     headers = {
         "Authorization": f"Bearer {API_TOKEN}",
         "Content-Type": "application/json"
@@ -117,7 +115,7 @@ def call_surepass_api(pan_number):
     payload = {"id_number": pan_number}
 
     try:
-        response = requests.post(url, headers=headers, json=payload, timeout=30)
+        response = requests.post(url, headers=headers, json=payload, timeout=30) # Increased timeout
         data = response.json()
         print(f"[DEBUG] Surepass API Response: {data}")
         if data.get("success") and data.get("data"):
@@ -126,16 +124,17 @@ def call_surepass_api(pan_number):
                 "name": result.get("full_name", "").strip(),
                 "dob": result.get("dob", "").strip(),
                 "gender": result.get("gender", "").strip().lower(),
-                "pan_number": pan_number
+                "pan_number": pan_number,
+                "aadhaar_linked": result.get("aadhaar_linked", None) # Correctly extracting aadhaar_linked
             }
-        # If API call was successful but data not found or other API error message
-        return {"error": data.get("message", "API verification failed"), "pan_number": pan_number}
+        # Handle cases where API call was successful but data not found or other API error message
+        return {"error": data.get("message", "API verification failed"), "pan_number": pan_number, "aadhaar_linked": None}
     except requests.exceptions.Timeout:
-        return {"error": "API request timed out", "pan_number": pan_number}
+        return {"error": "API request timed out", "pan_number": pan_number, "aadhaar_linked": None}
     except requests.exceptions.RequestException as e:
-        return {"error": f"API request failed: {e}", "pan_number": pan_number}
+        return {"error": f"API request failed: {e}", "pan_number": pan_number, "aadhaar_linked": None}
     except Exception as e:
-        return {"error": str(e), "pan_number": pan_number}
+        return {"error": str(e), "pan_number": pan_number, "aadhaar_linked": None}
 
 # --------- MAIN ENTRY ---------
 def extract_pan_data(file_path):
@@ -163,5 +162,8 @@ def extract_pan_data(file_path):
         surepass_result = {"error": "PAN number not found in document. Please ensure it's clearly visible."}
     else:
         surepass_result = call_surepass_api(pan_number)
+    
+    # Ensure aadhaar_linked is always present in the returned dictionary, even if API didn't provide it
+    surepass_result.setdefault("aadhaar_linked", None) 
     
     return {"extracted_data": surepass_result, "raw_ocr_text": raw_ocr_text}

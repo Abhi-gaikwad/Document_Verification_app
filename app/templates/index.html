@@ -652,12 +652,22 @@
                 let extractedDataHtml = '';
                 if (data.extracted_data && !data.extracted_data.error) {
                     for (const [key, value] of Object.entries(data.extracted_data)) {
-                        // Format keys nicely (e.g., 'pan_number' -> 'PAN Number')
-                        const formattedKey = key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+                        // Skip if value is null or undefined for display purposes
+                        if (value === null || value === undefined) continue; 
+                        
+                        // Format keys nicely (e.g., 'pan_number' -> 'PAN Number', 'aadhaar_linked' -> 'Aadhaar Linked')
+                        let formattedKey = key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+                        
+                        // Format boolean for display (true/false to Yes/No)
+                        let displayValue = value;
+                        if (typeof value === 'boolean') {
+                            displayValue = value ? 'Yes' : 'No';
+                        }
+
                         extractedDataHtml += `
                             <div class="data-row">
                                 <span class="data-label">${formattedKey}:</span>
-                                <span class="data-value">${value}</span>
+                                <span class="data-value">${displayValue}</span>
                             </div>
                         `;
                     }
