@@ -3,6 +3,8 @@ import os
 from werkzeug.utils import secure_filename
 # Correct import path based on your folder structure
 from app.verification.pan_verifier import extract_pan_data
+from app.verification.aadhaar_verifier import extract_aadhaar_data # Import aadhaar verifier
+import re # Import re for regex in routes
 
 app = Flask(__name__, template_folder='templates') # Corrected templates folder path
 app.config['UPLOAD_FOLDER'] = 'uploads/' # Create this folder in your project root
@@ -20,8 +22,6 @@ def index():
 def verify_document():
     """
     Handles document verification requests (PAN or Aadhaar).
-    This example specifically implements PAN verification.
-    For Aadhaar, you would integrate a separate OCR/API logic.
     """
     if 'document' not in request.files:
         return jsonify({"error": "No document file provided"}), 400
@@ -43,75 +43,108 @@ def verify_document():
         filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
         file.save(filepath)
 
-        extracted_data_from_pan_verifier = {}
+        extracted_data_for_response = {}
         raw_ocr_text = ""
+        is_document_verified = False
+        status_message = ""
 
         if doc_type == 'pan':
             result = extract_pan_data(filepath)
-            extracted_data_from_pan_verifier = result["extracted_data"]
+            extracted_data_for_response = result["extracted_data"]
             raw_ocr_text = result["raw_ocr_text"]
+
+            if not extracted_data_for_response.get("error"):
+                extracted_name = extracted_data_for_response.get("name", "").strip().lower()
+                extracted_dob = extracted_data_for_response.get("dob", "").strip()
+                extracted_gender = extracted_data_for_response.get("gender", "").strip().lower()
+
+                user_name_lower = user_name.strip().lower()
+                user_gender_lower = user_gender.strip().lower()
+
+                name_match = (user_name_lower in extracted_name) or \
+                             (extracted_name in user_name_lower) or \
+                             (user_name_lower.replace(" ", "") == extracted_name.replace(" ", ""))
+
+                dob_match = (user_dob == extracted_dob)
+                
+                gender_match = (user_gender_lower == extracted_gender) or \
+                               (user_gender_lower == 'female' and extracted_gender == 'f') or \
+                               (user_gender_lower == 'f' and extracted_gender == 'female') or \
+                               (user_gender_lower == 'male' and extracted_gender == 'm') or \
+                               (user_gender_lower == 'm' and extracted_gender == 'male')
+
+                if name_match and dob_match and gender_match:
+                    is_document_verified = True
+                    status_message = "Document Successfully Verified! All entered details match extracted details."
+                else:
+                    mismatch_details = []
+                    if not name_match:
+                        mismatch_details.append("Name mismatch.")
+                    if not dob_match:
+                        mismatch_details.append("Date of Birth mismatch.")
+                    if not gender_match:
+                        mismatch_details.append("Gender mismatch.")
+                    status_message = "Information mismatch: " + " ".join(mismatch_details)
+            else:
+                status_message = extracted_data_for_response.get("error", "An unknown error occurred during PAN processing.")
+
         elif doc_type == 'aadhaar':
-            # Placeholder: Call your Aadhaar verification logic here
-            # For example: from app.verification.aadhaar_verifier import extract_aadhaar_data
-            # result = extract_aadhaar_data(filepath)
-            # extracted_data_from_pan_verifier = result["extracted_data"]
-            # raw_ocr_text = result["raw_ocr_text"]
-            extracted_data_from_pan_verifier = {"error": "Aadhaar verification logic not implemented yet."}
-            raw_ocr_text = "" # No raw text if Aadhaar not implemented
+            result = extract_aadhaar_data(filepath)
+            extracted_data_for_response = result["extracted_data"]
+            raw_ocr_text = result["raw_ocr_text"]
+            is_aadhaar_document = result["is_aadhaar"] # Flag from aadhaar_verifier
+
+            if not is_aadhaar_document:
+                is_document_verified = False
+                status_message = extracted_data_for_response.get("error", "The uploaded document could not be identified as an Aadhaar card.")
+            elif extracted_data_for_response.get("error"):
+                is_document_verified = False
+                status_message = extracted_data_for_response.get("error", "An unknown error occurred during Aadhaar extraction.")
+            else:
+                extracted_name = extracted_data_for_response.get("name", "").strip().lower()
+                extracted_dob = extracted_data_for_response.get("dob", "").strip()
+                extracted_gender = extracted_data_for_response.get("gender", "").strip().lower()
+
+                user_name_lower = user_name.strip().lower()
+                # Format user DOB to match expected DD/MM/YYYY if it's YYYY-MM-DD
+                user_dob_formatted = user_dob
+                if re.match(r'^\d{4}-\d{2}-\d{2}$', user_dob):
+                    parts = user_dob.split('-')
+                    user_dob_formatted = f"{parts[2]}/{parts[1]}/{parts[0]}"
+                
+                user_gender_lower = user_gender.strip().lower()
+
+                name_match = (user_name_lower in extracted_name) or \
+                             (extracted_name in user_name_lower) or \
+                             (user_name_lower.replace(" ", "") == extracted_name.replace(" ", ""))
+
+                dob_match = (user_dob_formatted == extracted_dob)
+                
+                gender_match = (user_gender_lower == extracted_gender) or \
+                               (user_gender_lower == 'female' and extracted_gender == 'f') or \
+                               (user_gender_lower == 'f' and extracted_gender == 'female') or \
+                               (user_gender_lower == 'male' and extracted_gender == 'm') or \
+                               (user_gender_lower == 'm' and extracted_gender == 'male')
+
+                if name_match and dob_match and gender_match:
+                    is_document_verified = True
+                    status_message = "Aadhaar Card Successfully Verified! All entered details match extracted details."
+                else:
+                    mismatch_details = []
+                    if not name_match:
+                        mismatch_details.append("Name mismatch.")
+                    if not dob_match:
+                        mismatch_details.append("Date of Birth mismatch.")
+                    if not gender_match:
+                        mismatch_details.append("Gender mismatch.")
+                    status_message = "Information mismatch: " + " ".join(mismatch_details)
         else:
-            extracted_data_from_pan_verifier = {"error": "Invalid document type specified."}
-            raw_ocr_text = ""
+            is_document_verified = False
+            status_message = "Invalid document type specified."
 
         # Clean up the uploaded file
         if os.path.exists(filepath):
             os.remove(filepath)
-
-        is_verified = False
-        status_message = "Verification Failed."
-
-        if not extracted_data_from_pan_verifier.get("error"):
-            # Basic comparison logic (you'll need to enhance this significantly)
-            # For PAN, compare name, DOB, gender from extracted data with user input
-            extracted_name = extracted_data_from_pan_verifier.get("name", "").strip().lower()
-            extracted_dob = extracted_data_from_pan_verifier.get("dob", "").strip()
-            extracted_gender = extracted_data_from_pan_verifier.get("gender", "").strip().lower()
-
-            # Prepare user input for comparison
-            user_name_lower = user_name.strip().lower()
-            user_gender_lower = user_gender.strip().lower()
-
-            # Name comparison: Case-insensitive and handles variations with/without spaces
-            # Checks if user's name is in extracted name, or vice versa, or if they match after removing spaces
-            name_match = (user_name_lower in extracted_name) or \
-                         (extracted_name in user_name_lower) or \
-                         (user_name_lower.replace(" ", "") == extracted_name.replace(" ", ""))
-
-            dob_match = (user_dob == extracted_dob)
-            
-            # Gender comparison: Flexible for 'f'/'m' or 'female'/'male'
-            gender_match = (user_gender_lower == extracted_gender) or \
-                           (user_gender_lower == 'female' and extracted_gender == 'f') or \
-                           (user_gender_lower == 'f' and extracted_gender == 'female') or \
-                           (user_gender_lower == 'male' and extracted_gender == 'm') or \
-                           (user_gender_lower == 'm' and extracted_gender == 'male')
-
-
-            if name_match and dob_match and gender_match:
-                is_verified = True
-                status_message = "Document Successfully Verified! All entered details match extracted details."
-            else:
-                mismatch_details = []
-                if not name_match:
-                    mismatch_details.append("Name mismatch.")
-                if not dob_match:
-                    mismatch_details.append("Date of Birth mismatch.")
-                if not gender_match:
-                    mismatch_details.append("Gender mismatch.")
-                status_message = "Information mismatch: " + " ".join(mismatch_details)
-
-        else:
-            status_message = extracted_data_from_pan_verifier.get("error", "An unknown error occurred during processing.")
-
 
         return jsonify({
             "entered_data": {
@@ -119,9 +152,9 @@ def verify_document():
                 "dob": user_dob,
                 "gender": user_gender
             },
-            "extracted_data": extracted_data_from_pan_verifier,
-            "raw_ocr_text": raw_ocr_text, # Include raw OCR text here
-            "is_verified": is_verified,
+            "extracted_data": extracted_data_for_response,
+            "raw_ocr_text": raw_ocr_text,
+            "is_verified": is_document_verified,
             "status_message": status_message
         })
     return jsonify({"error": "File upload failed"}), 500
