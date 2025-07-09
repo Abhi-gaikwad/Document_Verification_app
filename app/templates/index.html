@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document Verification System</title>
     <style>
+        /* Your existing CSS here */
         * {
             margin: 0;
             padding: 0;
@@ -327,6 +328,48 @@
             100% { transform: rotate(360deg); }
         }
 
+        /* Styles for Collapsible Section */
+        .collapsible-header {
+            background-color: #e9ecef;
+            color: #495057;
+            cursor: pointer;
+            padding: 10px;
+            width: 100%;
+            border: none;
+            text-align: left;
+            outline: none;
+            font-size: 1rem;
+            transition: background-color 0.3s ease;
+            border-radius: 8px;
+            margin-top: 15px;
+            font-weight: 600;
+        }
+
+        .collapsible-header:hover {
+            background-color: #dee2e6;
+        }
+
+        .collapsible-content {
+            padding: 0 10px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.2s ease-out;
+            background-color: #f1f3f5;
+            border-radius: 0 0 8px 8px;
+        }
+
+        .collapsible-content pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-family: monospace;
+            font-size: 0.9em;
+            color: #343a40;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+
         @media (max-width: 768px) {
             .document-selection {
                 flex-direction: column;
@@ -351,7 +394,6 @@
         </div>
 
         <div class="main-content">
-            <!-- Document Selection -->
             <div id="document-selection" class="document-selection">
                 <div class="doc-option aadhaar" onclick="selectDocument('aadhaar')">
                     <h3>📄 Aadhaar Card</h3>
@@ -363,7 +405,6 @@
                 </div>
             </div>
 
-            <!-- Aadhaar Verification Form -->
             <div id="aadhaar-form" class="verification-form">
                 <div class="form-section">
                     <h3>📄 Aadhaar Card Verification</h3>
@@ -403,7 +444,6 @@
                 <button class="back-btn" onclick="goBack()">← Back</button>
             </div>
 
-            <!-- PAN Verification Form -->
             <div id="pan-form" class="verification-form">
                 <div class="form-section">
                     <h3>💳 PAN Card Verification</h3>
@@ -443,14 +483,12 @@
                 <button class="back-btn" onclick="goBack()">← Back</button>
             </div>
 
-            <!-- Loading -->
             <div id="loading" class="loading">
                 <div class="spinner"></div>
                 <h3>Processing your document...</h3>
                 <p>Please wait while we verify your information</p>
             </div>
 
-            <!-- Results Section -->
             <div id="results" class="results-section">
                 <h3>🔍 Verification Results</h3>
                 
@@ -458,21 +496,22 @@
                     <div class="data-card">
                         <h4>📝 Your Entered Data</h4>
                         <div id="entered-data">
-                            <!-- Entered data will be populated here -->
-                        </div>
+                            </div>
                     </div>
                     
                     <div class="data-card">
                         <h4>📄 Extracted Document Data</h4>
                         <div id="extracted-data">
-                            <!-- Extracted data will be populated here -->
+                            </div>
+                        <button class="collapsible-header" onclick="toggleCollapsible(this)">Show Raw OCR Text</button>
+                        <div class="collapsible-content">
+                            <pre id="raw-ocr-output"></pre>
                         </div>
                     </div>
                 </div>
 
                 <div id="verification-status" class="verification-status">
-                    <!-- Status will be populated here -->
-                </div>
+                    </div>
 
                 <button class="back-btn" onclick="startOver()">🔄 Verify Another Document</button>
             </div>
@@ -490,16 +529,14 @@
         }
 
         function goBack() {
-            document.getElementById('aadhaar-form').classList.remove('active');
-            document.getElementById('pan-form').classList.remove('active');
-            document.getElementById('results').classList.remove('active');
-            document.getElementById('document-selection').style.display = 'flex';
-            currentDocument = '';
+            startOver(false); // false means don't hide the doc selection at the end
         }
 
-        function startOver() {
+        function startOver(hideDocSelection = true) {
             document.getElementById('results').classList.remove('active');
-            document.getElementById('document-selection').style.display = 'flex';
+            if (hideDocSelection) {
+                document.getElementById('document-selection').style.display = 'flex';
+            }
             
             // Reset forms
             document.getElementById('aadhaar-form').classList.remove('active');
@@ -523,6 +560,16 @@
             
             uploadedFile = null;
             currentDocument = '';
+
+            // Reset collapsible state
+            const collapsibleHeaders = document.querySelectorAll('.collapsible-header');
+            collapsibleHeaders.forEach(header => {
+                const content = header.nextElementSibling;
+                if (content.style.maxHeight) {
+                    content.style.maxHeight = null;
+                }
+            });
+            document.getElementById('raw-ocr-output').textContent = '';
         }
 
         function handleFileUpload(docType) {
@@ -533,109 +580,124 @@
                 uploadedFile = fileInput.files[0];
                 label.classList.add('has-file');
                 label.innerHTML = `<div>✅ ${uploadedFile.name}</div><div style="font-size: 0.9rem; color: #666; margin-top: 5px;">File uploaded successfully</div>`;
+            } else {
+                uploadedFile = null;
+                label.classList.remove('has-file');
+                label.innerHTML = `<div>📤 Click to upload ${docType} card</div><div style="font-size: 0.9rem; color: #666; margin-top: 5px;">Supported formats: JPG, PNG, PDF</div>`;
             }
         }
 
-        function verifyDocument(docType) {
-            // Get form data
+        function toggleCollapsible(button) {
+            button.classList.toggle('active');
+            const content = button.nextElementSibling;
+            if (content.style.maxHeight) {
+                content.style.maxHeight = null;
+            } else {
+                content.style.maxHeight = content.scrollHeight + "px";
+            } 
+        }
+
+
+        async function verifyDocument(docType) {
             const name = document.getElementById(docType + '-name').value;
             const dob = document.getElementById(docType + '-dob').value;
             const gender = document.getElementById(docType + '-gender').value;
             
             if (!name || !dob || !gender || !uploadedFile) {
-                alert('Please fill all fields and upload a document');
+                alert('Please fill all fields and upload a document.');
                 return;
             }
 
-            // Show loading
             document.getElementById(docType + '-form').classList.remove('active');
             document.getElementById('loading').classList.add('active');
 
-            // Simulate API call
-            setTimeout(() => {
-                showResults(docType, name, dob, gender);
-            }, 3000);
-        }
+            const formData = new FormData();
+            formData.append('document', uploadedFile);
+            formData.append('docType', docType); // Pass document type to backend
+            formData.append('name', name);
+            formData.append('dob', dob);
+            formData.append('gender', gender);
 
-        function showResults(docType, name, dob, gender) {
-            document.getElementById('loading').classList.remove('active');
-            document.getElementById('results').classList.add('active');
+            try {
+                // Point this to your Flask endpoint
+                const response = await fetch('/verify-document', {
+                    method: 'POST',
+                    body: formData
+                });
 
-            // Simulate extracted data (in real app, this would come from OCR/API)
-            const extractedData = generateMockExtractedData(docType, name, dob, gender);
-            
-            // Populate entered data
-            const enteredDataHtml = `
-                <div class="data-row">
-                    <span class="data-label">Name:</span>
-                    <span class="data-value">${name}</span>
-                </div>
-                <div class="data-row">
-                    <span class="data-label">Date of Birth:</span>
-                    <span class="data-value">${dob}</span>
-                </div>
-                <div class="data-row">
-                    <span class="data-label">Gender:</span>
-                    <span class="data-value">${gender.charAt(0).toUpperCase() + gender.slice(1)}</span>
-                </div>
-            `;
-            
-            document.getElementById('entered-data').innerHTML = enteredDataHtml;
+                const data = await response.json();
+                console.log('Backend response:', data);
 
-            // Populate extracted data
-            let extractedDataHtml = '';
-            for (const [key, value] of Object.entries(extractedData)) {
-                extractedDataHtml += `
+                document.getElementById('loading').classList.remove('active');
+                document.getElementById('results').classList.add('active');
+
+                // Populate entered data
+                const enteredDataHtml = `
                     <div class="data-row">
-                        <span class="data-label">${key}:</span>
-                        <span class="data-value">${value}</span>
+                        <span class="data-label">Name:</span>
+                        <span class="data-value">${data.entered_data.name}</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Date of Birth:</span>
+                        <span class="data-value">${data.entered_data.dob}</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Gender:</span>
+                        <span class="data-value">${data.entered_data.gender.charAt(0).toUpperCase() + data.entered_data.gender.slice(1)}</span>
                     </div>
                 `;
-            }
-            
-            document.getElementById('extracted-data').innerHTML = extractedDataHtml;
+                document.getElementById('entered-data').innerHTML = enteredDataHtml;
 
-            // Determine verification status
-            const isVerified = Math.random() > 0.3; // 70% chance of verification success
-            const statusDiv = document.getElementById('verification-status');
-            
-            if (isVerified) {
-                statusDiv.className = 'verification-status verified';
-                statusDiv.innerHTML = `
-                    <div class="status-icon">✅</div>
-                    <div>Document Successfully Verified!</div>
-                    <div style="font-size: 0.9rem; margin-top: 10px;">All information matches and the document is authentic.</div>
-                `;
-            } else {
-                statusDiv.className = 'verification-status invalid';
-                statusDiv.innerHTML = `
-                    <div class="status-icon">❌</div>
-                    <div>Document Verification Failed</div>
-                    <div style="font-size: 0.9rem; margin-top: 10px;">Information mismatch or document appears to be invalid.</div>
-                `;
-            }
-        }
+                // Populate extracted data
+                let extractedDataHtml = '';
+                if (data.extracted_data && !data.extracted_data.error) {
+                    for (const [key, value] of Object.entries(data.extracted_data)) {
+                        // Format keys nicely (e.g., 'pan_number' -> 'PAN Number')
+                        const formattedKey = key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+                        extractedDataHtml += `
+                            <div class="data-row">
+                                <span class="data-label">${formattedKey}:</span>
+                                <span class="data-value">${value}</span>
+                            </div>
+                        `;
+                    }
+                } else {
+                    extractedDataHtml = `<div class="data-row"><span class="data-value" style="color: red;">Error: ${data.extracted_data ? data.extracted_data.error : 'Unknown error during extraction'}</span></div>`;
+                }
+                document.getElementById('extracted-data').innerHTML = extractedDataHtml;
 
-        function generateMockExtractedData(docType, name, dob, gender) {
-            // This simulates OCR extracted data
-            // In real implementation, this would come from your backend processing
-            
-            if (docType === 'aadhaar') {
-                return {
-                    'Name': name + (Math.random() > 0.8 ? ' Kumar' : ''), // Sometimes add variation
-                    'Date of Birth': dob,
-                    'Gender': gender.charAt(0).toUpperCase() + gender.slice(1),
-                    'Aadhaar Number': 'XXXX XXXX ' + Math.floor(1000 + Math.random() * 9000),
-                    'Address': 'Sample Address, City - 123456'
-                };
-            } else {
-                return {
-                    'Name': name + (Math.random() > 0.8 ? ' Singh' : ''),
-                    'Date of Birth': dob,
-                    'Gender': gender.charAt(0).toUpperCase() + gender.slice(1),
-                    'PAN Number': 'ABCDE' + Math.floor(1000 + Math.random() * 9000) + 'F',
-                    'Father\'s Name': 'Sample Father Name'
-                };
+                // Populate Raw OCR Text
+                document.getElementById('raw-ocr-output').textContent = data.raw_ocr_text || "No raw text extracted or provided.";
+
+
+                // Determine verification status
+                const statusDiv = document.getElementById('verification-status');
+                if (data.is_verified) {
+                    statusDiv.className = 'verification-status verified';
+                    statusDiv.innerHTML = `
+                        <div class="status-icon">✅</div>
+                        <div>Document Successfully Verified!</div>
+                        <div style="font-size: 0.9rem; margin-top: 10px;">${data.status_message}</div>
+                    `;
+                } else {
+                    statusDiv.className = 'verification-status invalid';
+                    statusDiv.innerHTML = `
+                        <div class="status-icon">❌</div>
+                        <div>Document Verification Failed</div>
+                        <div style="font-size: 0.9rem; margin-top: 10px;">${data.status_message}</div>
+                    `;
+                }
+
+            } catch (error) {
+                console.error('Error during verification:', error);
+                document.getElementById('loading').classList.remove('active');
+                document.getElementById('results').classList.add('active');
+                document.getElementById('verification-status').className = 'verification-status invalid';
+                document.getElementById('verification-status').innerHTML = `
+                    <div class="status-icon">❗</div>
+                    <div>An unexpected error occurred.</div>
+                    <div style="font-size: 0.9rem; margin-top: 10px;">Please check the console for details and try again.</div>
+                `;
             }
         }
     </script>
