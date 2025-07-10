@@ -9,7 +9,9 @@ RUN apt-get update && apt-get install -y \
     libxrender1 \
     libxext6 \
     poppler-utils \
+    libgl1 \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
+
 
 # Set working directory
 WORKDIR /app
