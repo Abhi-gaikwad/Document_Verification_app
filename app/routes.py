@@ -101,9 +101,26 @@ def verify_document():
                 is_document_verified = False
                 status_message = extracted_data_for_response.get("error", "An unknown error occurred during Aadhaar extraction.")
             else:
-                extracted_name = extracted_data_for_response.get("name", "").strip().lower()
-                extracted_dob = extracted_data_for_response.get("dob", "").strip()
-                extracted_gender = extracted_data_for_response.get("gender", "").strip().lower()
+                # Safely get extracted_name, ensuring it's a string before stripping
+                extracted_name = extracted_data_for_response.get("name")
+                if extracted_name is not None:
+                    extracted_name = str(extracted_name).strip().lower()
+                else:
+                    extracted_name = "" # Default to empty string if None
+
+                # Safely get extracted_dob, ensuring it's a string before stripping
+                extracted_dob = extracted_data_for_response.get("dob")
+                if extracted_dob is not None:
+                    extracted_dob = str(extracted_dob).strip()
+                else:
+                    extracted_dob = "" # Default to empty string if None
+                
+                # Safely get extracted_gender, ensuring it's a string before stripping
+                extracted_gender = extracted_data_for_response.get("gender")
+                if extracted_gender is not None:
+                    extracted_gender = str(extracted_gender).strip().lower()
+                else:
+                    extracted_gender = "" # Default to empty string if None
 
                 user_name_lower = user_name.strip().lower()
                 # Format user DOB to match expected DD/MM/YYYY if it's YYYY-MM-DD
