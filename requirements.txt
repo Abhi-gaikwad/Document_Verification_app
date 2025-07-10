@@ -1,0 +1,8 @@
+Flask==2.3.3
+pytesseract==0.3.10
+opencv-python==4.9.0.80
+Pillow==10.3.0
+python-dotenv==1.0.1
+PyMuPDF==1.23.21
+requests==2.32.3
+numpy==1.26.4
