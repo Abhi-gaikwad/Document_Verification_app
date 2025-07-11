@@ -42,6 +42,16 @@
             opacity: 0.9;
         }
 
+        /* Added style for logo */
+        .logo {
+            margin-bottom: 20px; /* Adjust as needed */
+        }
+
+        .logo img {
+            max-width: 200px; /* Adjust as needed */
+            height: auto;
+        }
+
         .main-content {
             background: white;
             border-radius: 20px;
@@ -303,24 +313,157 @@
             background: #5a6268;
         }
 
+        /* Enhanced 2-Step Loading Styles */
         .loading {
             display: none;
             text-align: center;
-            padding: 20px;
+            padding: 40px;
+            max-width: 600px;
+            margin: 0 auto;
         }
 
         .loading.active {
             display: block;
         }
 
+        .loading-container {
+            background: #f8f9fa;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .loading-header {
+            margin-bottom: 30px;
+        }
+
+        .loading-header h3 {
+            color: #333;
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+
+        .loading-header p {
+            color: #666;
+            font-size: 1rem;
+        }
+
+        .step-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .step-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+            position: relative;
+        }
+
+        .step-circle {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 2;
+        }
+
+        .step-circle.pending {
+            background: #e9ecef;
+            color: #6c757d;
+            border: 3px solid #dee2e6;
+        }
+
+        .step-circle.active {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            border: 3px solid #4facfe;
+            animation: pulse 2s infinite;
+        }
+
+        .step-circle.completed {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            color: white;
+            border: 3px solid #43e97b;
+        }
+
+        .step-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+            font-size: 1rem;
+        }
+
+        .step-description {
+            color: #666;
+            font-size: 0.9rem;
+            text-align: center;
+            max-width: 120px;
+        }
+
+        .step-connector {
+            position: absolute;
+            top: 30px;
+            left: 50%;
+            right: -50%;
+            height: 4px;
+            background: #e9ecef;
+            z-index: 1;
+        }
+
+        .step-item:last-child .step-connector {
+            display: none;
+        }
+
+        .step-connector.active {
+            background: linear-gradient(90deg, #4facfe 0%, #00f2fe 100%);
+            animation: fillProgress 1s ease-in-out;
+        }
+
+        .step-connector.completed {
+            background: linear-gradient(90deg, #43e97b 0%, #38f9d7 100%);
+        }
+
+        .current-step-info {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+
+        .current-step-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .current-step-description {
+            color: #666;
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+
         .spinner {
-            width: 50px;
-            height: 50px;
+            width: 40px;
+            height: 40px;
             border: 4px solid #f3f3f3;
             border-top: 4px solid #4facfe;
             border-radius: 50%;
             animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
+            margin: 0 auto;
         }
 
         @keyframes spin {
@@ -328,7 +471,35 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* Styles for Collapsible Section */
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(79, 172, 254, 0.7); }
+            50% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(79, 172, 254, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(79, 172, 254, 0); }
+        }
+
+        @keyframes fillProgress {
+            0% { width: 0%; }
+            100% { width: 100%; }
+        }
+
+        /* Progress Bar */
+        .progress-bar-container {
+            width: 100%;
+            height: 8px;
+            background: #e9ecef;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #4facfe 0%, #00f2fe 100%);
+            transition: width 0.5s ease;
+            border-radius: 4px;
+        }
+
+        /* Collapsible Section */
         .collapsible-header {
             background-color: #e9ecef;
             color: #495057;
@@ -383,12 +554,28 @@
             .form-grid {
                 grid-template-columns: 1fr;
             }
+
+            .step-container {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .step-connector {
+                display: none;
+            }
+
+            .loading-container {
+                padding: 20px;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
+            <div class="logo">
+                <img src="Prasaarlogo.jpg" alt="Prasaar Technologies Logo">
+            </div>
             <h1>Document Verification System</h1>
             <p>Secure and Fast Aadhaar & PAN Card Verification</p>
         </div>
@@ -484,9 +671,40 @@
             </div>
 
             <div id="loading" class="loading">
-                <div class="spinner"></div>
-                <h3>Processing your document...</h3>
-                <p>Please wait while we verify your information</p>
+                <div class="loading-container">
+                    <div class="loading-header">
+                        <h3>Processing Your Document</h3>
+                        <p>Please wait while we verify your information securely</p>
+                    </div>
+
+                    <div class="progress-bar-container">
+                        <div class="progress-bar" id="progress-bar"></div>
+                    </div>
+
+                    <div class="step-container">
+                        <div class="step-item">
+                            <div class="step-circle pending" id="step1-circle">
+                                <span>📄</span>
+                            </div>
+                            <div class="step-title">Document Processing</div>
+                            <div class="step-description">Extracting information from your document</div>
+                            <div class="step-connector" id="step1-connector"></div>
+                        </div>
+                        <div class="step-item">
+                            <div class="step-circle pending" id="step2-circle">
+                                <span>🔍</span>
+                            </div>
+                            <div class="step-title">Data Verification</div>
+                            <div class="step-description">Comparing with provided information</div>
+                        </div>
+                    </div>
+
+                    <div class="current-step-info">
+                        <div class="current-step-title" id="current-step-title">Initializing...</div>
+                        <div class="current-step-description" id="current-step-description">Setting up verification process</div>
+                        <div class="spinner" id="loading-spinner"></div>
+                    </div>
+                </div>
             </div>
 
             <div id="results" class="results-section">
@@ -521,6 +739,7 @@
     <script>
         let currentDocument = '';
         let uploadedFile = null;
+        let currentStep = 0;
 
         function selectDocument(docType) {
             currentDocument = docType;
@@ -529,7 +748,7 @@
         }
 
         function goBack() {
-            startOver(false); // false means don't hide the doc selection at the end
+            startOver(false);
         }
 
         function startOver(hideDocSelection = true) {
@@ -560,6 +779,7 @@
             
             uploadedFile = null;
             currentDocument = '';
+            currentStep = 0;
 
             // Reset collapsible state
             const collapsibleHeaders = document.querySelectorAll('.collapsible-header');
@@ -570,6 +790,58 @@
                 }
             });
             document.getElementById('raw-ocr-output').textContent = '';
+            
+            // Reset loading states
+            resetLoadingStates();
+        }
+
+        function resetLoadingStates() {
+            document.getElementById('step1-circle').className = 'step-circle pending';
+            document.getElementById('step2-circle').className = 'step-circle pending';
+            document.getElementById('step1-connector').className = 'step-connector';
+            document.getElementById('progress-bar').style.width = '0%';
+            document.getElementById('current-step-title').textContent = 'Initializing...';
+            document.getElementById('current-step-description').textContent = 'Setting up verification process';
+        }
+
+        function updateLoadingStep(step) {
+            const steps = [
+                {
+                    title: 'Document Processing',
+                    description: 'Scanning and extracting text from your document using OCR technology',
+                    progress: 25
+                },
+                {
+                    title: 'Data Verification',
+                    description: 'Comparing extracted information with your provided details',
+                    progress: 75
+                },
+                {
+                    title: 'Finalizing Results',
+                    description: 'Completing verification and generating results',
+                    progress: 100
+                }
+            ];
+
+            currentStep = step;
+            const stepInfo = steps[step];
+            
+            // Update progress bar
+            document.getElementById('progress-bar').style.width = stepInfo.progress + '%';
+            
+            // Update current step info
+            document.getElementById('current-step-title').textContent = stepInfo.title;
+            document.getElementById('current-step-description').textContent = stepInfo.description;
+            
+            // Update step circles and connectors
+            if (step >= 0) {
+                document.getElementById('step1-circle').className = step === 0 ? 'step-circle active' : 'step-circle completed';
+                document.getElementById('step1-connector').className = step > 0 ? 'step-connector completed' : 'step-connector active';
+            }
+            
+            if (step >= 1) {
+                document.getElementById('step2-circle').className = step === 1 ? 'step-circle active' : 'step-circle completed';
+            }
         }
 
         function handleFileUpload(docType) {
@@ -597,7 +869,6 @@
             } 
         }
 
-
         async function verifyDocument(docType) {
             const name = document.getElementById(docType + '-name').value;
             const dob = document.getElementById(docType + '-dob').value;
@@ -610,10 +881,17 @@
 
             document.getElementById(docType + '-form').classList.remove('active');
             document.getElementById('loading').classList.add('active');
+            
+            // Reset loading states
+            resetLoadingStates();
+
+            // Simulate 2-step verification process
+            setTimeout(() => updateLoadingStep(0), 500);
+            setTimeout(() => updateLoadingStep(1), 3000);
 
             const formData = new FormData();
             formData.append('document', uploadedFile);
-            formData.append('docType', docType); // Pass document type to backend
+            formData.append('docType', docType);
             formData.append('name', name);
             formData.append('dob', dob);
             formData.append('gender', gender);
@@ -628,86 +906,94 @@
                 const data = await response.json();
                 console.log('Backend response:', data);
 
-                document.getElementById('loading').classList.remove('active');
-                document.getElementById('results').classList.add('active');
+                // Complete the loading process
+                setTimeout(() => updateLoadingStep(2), 4500);
+                
+                // Show results after a brief delay
+                setTimeout(() => {
+                    document.getElementById('loading').classList.remove('active');
+                    document.getElementById('results').classList.add('active');
 
-                // Populate entered data
-                const enteredDataHtml = `
-                    <div class="data-row">
-                        <span class="data-label">Name:</span>
-                        <span class="data-value">${data.entered_data.name}</span>
-                    </div>
-                    <div class="data-row">
-                        <span class="data-label">Date of Birth:</span>
-                        <span class="data-value">${data.entered_data.dob}</span>
-                    </div>
-                    <div class="data-row">
-                        <span class="data-label">Gender:</span>
-                        <span class="data-value">${data.entered_data.gender.charAt(0).toUpperCase() + data.entered_data.gender.slice(1)}</span>
-                    </div>
-                `;
-                document.getElementById('entered-data').innerHTML = enteredDataHtml;
+                    // Populate entered data
+                    const enteredDataHtml = `
+                        <div class="data-row">
+                            <span class="data-label">Name:</span>
+                            <span class="data-value">${data.entered_data.name}</span>
+                        </div>
+                        <div class="data-row">
+                            <span class="data-label">Date of Birth:</span>
+                            <span class="data-value">${data.entered_data.dob}</span>
+                        </div>
+                        <div class="data-row">
+                            <span class="data-label">Gender:</span>
+                            <span class="data-value">${data.entered_data.gender.charAt(0).toUpperCase() + data.entered_data.gender.slice(1)}</span>
+                        </div>
+                    `;
+                    document.getElementById('entered-data').innerHTML = enteredDataHtml;
 
-                // Populate extracted data
-                let extractedDataHtml = '';
-                if (data.extracted_data && !data.extracted_data.error) {
-                    for (const [key, value] of Object.entries(data.extracted_data)) {
-                        // Skip if value is null or undefined for display purposes
-                        if (value === null || value === undefined) continue; 
-                        
-                        // Format keys nicely (e.g., 'pan_number' -> 'PAN Number', 'aadhaar_linked' -> 'Aadhaar Linked')
-                        let formattedKey = key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
-                        
-                        // Format boolean for display (true/false to Yes/No)
-                        let displayValue = value;
-                        if (typeof value === 'boolean') {
-                            displayValue = value ? 'Yes' : 'No';
+                    // Populate extracted data
+                    let extractedDataHtml = '';
+                    if (data.extracted_data && !data.extracted_data.error) {
+                        for (const [key, value] of Object.entries(data.extracted_data)) {
+                            // Skip if value is null or undefined for display purposes
+                            if (value === null || value === undefined) continue; 
+                            
+                            // Format keys nicely (e.g., 'pan_number' -> 'PAN Number', 'aadhaar_linked' -> 'Aadhaar Linked')
+                            let formattedKey = key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+                            
+                            // Format boolean for display (true/false to Yes/No)
+                            let displayValue = value;
+                            if (typeof value === 'boolean') {
+                                displayValue = value ? 'Yes' : 'No';
+                            }
+
+                            extractedDataHtml += `
+                                <div class="data-row">
+                                    <span class="data-label">${formattedKey}:</span>
+                                    <span class="data-value">${displayValue}</span>
+                                </div>
+                            `;
                         }
+                    } else {
+                        extractedDataHtml = `<div class="data-row"><span class="data-value" style="color: red;">Error: ${data.extracted_data ? data.extracted_data.error : 'Unknown error during extraction'}</span></div>`;
+                    }
+                    document.getElementById('extracted-data').innerHTML = extractedDataHtml;
 
-                        extractedDataHtml += `
-                            <div class="data-row">
-                                <span class="data-label">${formattedKey}:</span>
-                                <span class="data-value">${displayValue}</span>
-                            </div>
+                    // Populate Raw OCR Text
+                    document.getElementById('raw-ocr-output').textContent = data.raw_ocr_text || "No raw text extracted or provided.";
+
+                    // Determine verification status
+                    const statusDiv = document.getElementById('verification-status');
+                    if (data.is_verified) {
+                        statusDiv.className = 'verification-status verified';
+                        statusDiv.innerHTML = `
+                            <div class="status-icon">✅</div>
+                            <div>Document Successfully Verified!</div>
+                            <div style="font-size: 0.9rem; margin-top: 10px;">${data.status_message}</div>
+                        `;
+                    } else {
+                        statusDiv.className = 'verification-status invalid';
+                        statusDiv.innerHTML = `
+                            <div class="status-icon">❌</div>
+                            <div>Document Verification Failed</div>
+                            <div style="font-size: 0.9rem; margin-top: 10px;">${data.status_message}</div>
                         `;
                     }
-                } else {
-                    extractedDataHtml = `<div class="data-row"><span class="data-value" style="color: red;">Error: ${data.extracted_data ? data.extracted_data.error : 'Unknown error during extraction'}</span></div>`;
-                }
-                document.getElementById('extracted-data').innerHTML = extractedDataHtml;
-
-                // Populate Raw OCR Text
-                document.getElementById('raw-ocr-output').textContent = data.raw_ocr_text || "No raw text extracted or provided.";
-
-
-                // Determine verification status
-                const statusDiv = document.getElementById('verification-status');
-                if (data.is_verified) {
-                    statusDiv.className = 'verification-status verified';
-                    statusDiv.innerHTML = `
-                        <div class="status-icon">✅</div>
-                        <div>Document Successfully Verified!</div>
-                        <div style="font-size: 0.9rem; margin-top: 10px;">${data.status_message}</div>
-                    `;
-                } else {
-                    statusDiv.className = 'verification-status invalid';
-                    statusDiv.innerHTML = `
-                        <div class="status-icon">❌</div>
-                        <div>Document Verification Failed</div>
-                        <div style="font-size: 0.9rem; margin-top: 10px;">${data.status_message}</div>
-                    `;
-                }
+                }, 5500);
 
             } catch (error) {
                 console.error('Error during verification:', error);
-                document.getElementById('loading').classList.remove('active');
-                document.getElementById('results').classList.add('active');
-                document.getElementById('verification-status').className = 'verification-status invalid';
-                document.getElementById('verification-status').innerHTML = `
-                    <div class="status-icon">❗</div>
-                    <div>An unexpected error occurred.</div>
-                    <div style="font-size: 0.9rem; margin-top: 10px;">Please check the console for details and try again.</div>
-                `;
+                
+                setTimeout(() => {
+                    document.getElementById('loading').classList.remove('active');
+                    document.getElementById('results').classList.add('active');
+                    document.getElementById('verification-status').className = 'verification-status invalid';
+                    document.getElementById('verification-status').innerHTML = `
+                        <div class="status-icon">❗</div>
+                        <div>An unexpected error occurred.</div>
+                        <div style="font-size: 0.9rem; margin-top: 10px;">Please check the console for details and try again.</div>
+                    `;
+                }, 2000);
             }
         }
     </script>
