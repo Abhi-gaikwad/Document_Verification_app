@@ -46,10 +46,10 @@
                         <h3>Aadhaar Card</h3>
                         <p>Unique Identification Authority of India</p>
                         <div class="card-sample-preview">
-                            <p>Name: Sample Name</p>
-                            <p>DOB: 01/01/1990</p>
+                            <p>Name:Narendra Damodardas Modi</p>
+                            <p>DOB: 17/09/1950</p>
                             <p>Gender: Male</p>
-                            <p>XXXX XXXX 1234</p>
+                            <p>XXXX XXXX 8934</p>
                         </div>
                     </div>
                     <div class="doc-option-card pan" onclick="selectDocument('pan')">
@@ -59,10 +59,10 @@
                         <h3>PAN Card</h3>
                         <p>Permanent Account Number</p>
                         <div class="card-sample-preview">
-                            <p>Name: Sample Name</p>
-                            <p>Father's Name: Father Name</p>
-                            <p>DOB: 01/01/1990</p>
-                            <p>PAN: ABCDE1234F</p>
+                            <p>Name: Narendra Damodardas Modi</p>
+                            <p>Father's Name: Damodardas Mulchand Modi</p>
+                            <p>DOB: 17/09/1950</p>
+                            <p>PAN: SQE1234F</p>
                         </div>
                     </div>
                 </div>
@@ -76,8 +76,10 @@
                                 <input type="text" id="aadhaar-name" placeholder="Enter your full name" required>
                             </div>
                             <div class="form-group">
-                                <label for="aadhaar-dob">Date of Birth</label>
-                                <input type="date" id="aadhaar-dob" required>
+                                <label for="aadhaar-dob">Date of Birth <span class="date-format">(DD/MM/YYYY)</span></label>
+                                <input type="text" id="aadhaar-dob" placeholder="DD/MM/YYYY" maxlength="10" 
+                                       oninput="formatDateInput(this)" required>
+                                <small class="date-hint">Enter date in DD/MM/YYYY format (e.g., 15/08/1990)</small>
                             </div>
                             <div class="form-group">
                                 <label for="aadhaar-gender">Gender</label>
@@ -122,8 +124,10 @@
                                 <input type="text" id="pan-name" placeholder="Enter your full name" required>
                             </div>
                             <div class="form-group">
-                                <label for="pan-dob">Date of Birth</label>
-                                <input type="date" id="pan-dob" required>
+                                <label for="pan-dob">Date of Birth <span class="date-format">(DD/MM/YYYY)</span></label>
+                                <input type="text" id="pan-dob" placeholder="DD/MM/YYYY" maxlength="10" 
+                                       oninput="formatDateInput(this)" required>
+                                <small class="date-hint">Enter date in DD/MM/YYYY format (e.g., 15/08/1990)</small>
                             </div>
                             <div class="form-group">
                                 <label for="pan-gender">Gender</label>
@@ -263,5 +267,52 @@
     </footer>
 
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    
+    <style>
+        .date-format {
+            font-size: 0.85em;
+            color: #666;
+            font-weight: normal;
+        }
+        
+        .date-hint {
+            color: #666;
+            font-size: 0.8em;
+            margin-top: 4px;
+            display: block;
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        /* Style for date input fields */
+        input[type="text"]#aadhaar-dob,
+        input[type="text"]#pan-dob {
+            font-family: monospace;
+            letter-spacing: 1px;
+            font-size: 1rem;
+        }
+        
+        input[type="text"]#aadhaar-dob:focus,
+        input[type="text"]#pan-dob:focus {
+            outline: 2px solid #007bff;
+            outline-offset: 2px;
+        }
+        
+        /* Invalid date styling */
+        input[type="text"]#aadhaar-dob.invalid,
+        input[type="text"]#pan-dob.invalid {
+            border-color: #dc3545;
+            background-color: #fff5f5;
+        }
+        
+        /* Valid date styling */
+        input[type="text"]#aadhaar-dob.valid,
+        input[type="text"]#pan-dob.valid {
+            border-color: #28a745;
+            background-color: #f8fff8;
+        }
+    </style>
 </body>
 </html>

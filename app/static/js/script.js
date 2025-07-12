@@ -2,6 +2,89 @@ let currentDocument = '';
 let uploadedFile = null;
 let currentStep = 0;
 
+// Function to format date from YYYY-MM-DD to DD/MM/YYYY
+function formatDateToIndian(dateString) {
+    if (!dateString) return '';
+    
+    // If already in DD/MM/YYYY format, return as is
+    if (dateString.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
+        return dateString;
+    }
+    
+    // Convert from YYYY-MM-DD or other formats
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return dateString; // Return original if invalid
+    
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
+}
+
+// Function to parse Indian date format DD/MM/YYYY to YYYY-MM-DD for backend
+function parseIndianDateForBackend(indianDateString) {
+    if (!indianDateString) return '';
+    const parts = indianDateString.split('/');
+    if (parts.length !== 3) return indianDateString; // Return original if not in expected format
+    const day = parts[0];
+    const month = parts[1];
+    const year = parts[2];
+    return `${year}-${month}-${day}`;
+}
+
+// Function to validate Indian date format
+function validateIndianDate(dateString) {
+    if (!dateString) return false;
+    
+    // Check if it matches DD/MM/YYYY pattern
+    const dateRegex = /^(\d{2})\/(\d{2})\/(\d{4})$/;
+    const match = dateString.match(dateRegex);
+    
+    if (!match) return false;
+    
+    const day = parseInt(match[1], 10);
+    const month = parseInt(match[2], 10);
+    const year = parseInt(match[3], 10);
+    
+    // Basic validation
+    if (month < 1 || month > 12) return false;
+    if (day < 1 || day > 31) return false;
+    if (year < 1900 || year > new Date().getFullYear()) return false;
+    
+    // Create date object to validate the actual date
+    const date = new Date(year, month - 1, day);
+    return date.getFullYear() === year && 
+           date.getMonth() === month - 1 && 
+           date.getDate() === day;
+}
+
+// Function to format date input as user types
+function formatDateInput(input) {
+    let value = input.value.replace(/\D/g, ''); // Remove non-digits
+    
+    if (value.length >= 2) {
+        value = value.substring(0, 2) + '/' + value.substring(2);
+    }
+    if (value.length >= 5) {
+        value = value.substring(0, 5) + '/' + value.substring(5, 9);
+    }
+    
+    input.value = value;
+    
+    // Real-time validation feedback
+    if (value.length === 10) {
+        if (validateIndianDate(value)) {
+            input.classList.remove('invalid');
+            input.classList.add('valid');
+        } else {
+            input.classList.remove('valid');
+            input.classList.add('invalid');
+        }
+    } else {
+        input.classList.remove('valid', 'invalid');
+    }
+}
+
 function selectDocument(docType) {
     currentDocument = docType;
     document.getElementById('document-selection').style.display = 'none'; // Hide selection
@@ -145,6 +228,12 @@ async function verifyDocument(docType) {
         return;
     }
 
+    // Validate date format
+    if (!validateIndianDate(dob)) {
+        alert('Please enter a valid date in DD/MM/YYYY format.');
+        return;
+    }
+
     document.getElementById(docType + '-form').classList.remove('active');
     document.getElementById('loading').classList.add('active');
 
@@ -159,7 +248,8 @@ async function verifyDocument(docType) {
     formData.append('document', uploadedFile);
     formData.append('docType', docType);
     formData.append('name', name);
-    formData.append('dob', dob);
+    // Convert Indian date format to backend format if needed
+    formData.append('dob', parseIndianDateForBackend(dob));
     formData.append('gender', gender);
 
     try {
@@ -180,7 +270,7 @@ async function verifyDocument(docType) {
             document.getElementById('loading').classList.remove('active');
             document.getElementById('results').classList.add('active');
 
-            // Populate entered data
+            // Populate entered data with Indian date format (already in Indian format)
             const enteredDataHtml = `
                 <div class="data-row">
                     <span class="data-label">Name:</span>
@@ -188,7 +278,7 @@ async function verifyDocument(docType) {
                 </div>
                 <div class="data-row">
                     <span class="data-label">Date of Birth:</span>
-                    <span class="data-value">${data.entered_data.dob}</span>
+                    <span class="data-value">${dob}</span>
                 </div>
                 <div class="data-row">
                     <span class="data-label">Gender:</span>
@@ -197,7 +287,7 @@ async function verifyDocument(docType) {
             `;
             document.getElementById('entered-data').innerHTML = enteredDataHtml;
 
-            // Populate extracted data
+            // Populate extracted data with Indian date format
             let extractedDataHtml = '';
             if (data.extracted_data && !data.extracted_data.error) {
                 for (const [key, value] of Object.entries(data.extracted_data)) {
@@ -207,10 +297,13 @@ async function verifyDocument(docType) {
                     // Format keys nicely (e.g., 'pan_number' -> 'PAN Number', 'aadhaar_linked' -> 'Aadhaar Linked')
                     let formattedKey = key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
 
-                    // Format boolean for display (true/false to Yes/No)
+                    // Format values for display
                     let displayValue = value;
                     if (typeof value === 'boolean') {
                         displayValue = value ? 'Yes' : 'No';
+                    } else if (key.toLowerCase().includes('dob') || key.toLowerCase().includes('date')) {
+                        // Check if it's a date field and format it to Indian format
+                        displayValue = formatDateToIndian(value);
                     }
 
                     extractedDataHtml += `
