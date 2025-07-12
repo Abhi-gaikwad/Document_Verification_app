@@ -3,1169 +3,265 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document Verification System</title>
-    <style>
-        /* Your existing CSS here */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            color: #333;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 40px;
-            color: white;
-        }
-
-        .header h1 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-            font-weight: 700;
-        }
-
-        .header p {
-            font-size: 1.2rem;
-            opacity: 0.9;
-        }
-
-        /* Added style for logo */
-        .logo {
-            margin-bottom: 20px; /* Adjust as needed */
-        }
-
-        .logo img {
-            max-width: 200px; /* Adjust as needed */
-            height: auto;
-        }
-
-        .main-content {
-            background: white;
-            border-radius: 20px;
-            padding: 40px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            margin-bottom: 30px;
-        }
-
-        .document-selection {
-            display: flex;
-            justify-content: center;
-            gap: 40px;
-            margin-bottom: 40px;
-        }
-
-        .doc-option {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            color: white;
-            padding: 30px 40px;
-            border-radius: 15px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-align: center;
-            min-width: 200px;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-        }
-
-        .doc-option:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
-        }
-
-        .doc-option.aadhaar {
-            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-        }
-
-        .doc-option.pan {
-            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
-        }
-
-        .doc-option.selected {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 35px rgba(0,0,0,0.25);
-        }
-
-        .doc-option h3 {
-            font-size: 1.5rem;
-            margin-bottom: 10px;
-        }
-
-        .doc-option p {
-            opacity: 0.9;
-            font-size: 0.9rem;
-        }
-
-        .verification-form {
-            display: none;
-            animation: fadeIn 0.5s ease-in;
-        }
-
-        .verification-form.active {
-            display: block;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .form-section {
-            margin-bottom: 30px;
-        }
-
-        .form-section h3 {
-            color: #333;
-            margin-bottom: 20px;
-            font-size: 1.3rem;
-            border-bottom: 2px solid #eee;
-            padding-bottom: 10px;
-        }
-
-        .form-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-bottom: 20px;
-        }
-
-        .form-group {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .form-group label {
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #555;
-        }
-
-        .form-group input, .form-group select {
-            padding: 12px;
-            border: 2px solid #e1e5e9;
-            border-radius: 8px;
-            font-size: 1rem;
-            transition: border-color 0.3s ease;
-        }
-
-        .form-group input:focus, .form-group select:focus {
-            outline: none;
-            border-color: #4facfe;
-        }
-
-        .file-upload {
-            position: relative;
-            display: inline-block;
-            width: 100%;
-        }
-
-        .file-upload input[type="file"] {
-            position: absolute;
-            left: -9999px;
-        }
-
-        .file-upload label {
-            display: block;
-            background: #f8f9fa;
-            border: 2px dashed #dee2e6;
-            border-radius: 8px;
-            padding: 30px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .file-upload label:hover {
-            background: #e9ecef;
-            border-color: #4facfe;
-        }
-
-        .file-upload label.has-file {
-            background: #e8f5e8;
-            border-color: #28a745;
-        }
-
-        .verify-btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 15px 40px;
-            border: none;
-            border-radius: 8px;
-            font-size: 1.1rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin-top: 20px;
-            width: 100%;
-        }
-
-        .verify-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-        }
-
-        .verify-btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-
-        .results-section {
-            display: none;
-            margin-top: 40px;
-            animation: fadeIn 0.5s ease-in;
-        }
-
-        .results-section.active {
-            display: block;
-        }
-
-        .comparison-cards {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
-            margin-bottom: 30px;
-        }
-
-        .data-card {
-            background: #f8f9fa;
-            border-radius: 15px;
-            padding: 25px;
-            border: 1px solid #e9ecef;
-        }
-
-        .data-card h4 {
-            color: #495057;
-            margin-bottom: 20px;
-            font-size: 1.2rem;
-            text-align: center;
-        }
-
-        .data-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 0;
-            border-bottom: 1px solid #e9ecef;
-        }
-
-        .data-row:last-child {
-            border-bottom: none;
-        }
-
-        .data-label {
-            font-weight: 600;
-            color: #6c757d;
-        }
-
-        .data-value {
-            color: #495057;
-            font-weight: 500;
-        }
-
-        .verification-status {
-            text-align: center;
-            padding: 25px;
-            border-radius: 15px;
-            margin-top: 30px;
-            font-size: 1.2rem;
-            font-weight: 600;
-        }
-
-        .verification-status.verified {
-            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
-            color: #155724;
-            border: 2px solid #c3e6cb;
-        }
-
-        .verification-status.invalid {
-            background: linear-gradient(135deg, #f8d7da 0%, #f1aeb5 100%);
-            color: #721c24;
-            border: 2px solid #f1aeb5;
-        }
-
-        .status-icon {
-            font-size: 3rem;
-            margin-bottom: 10px;
-        }
-
-        .back-btn {
-            background: #6c757d;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            margin-top: 20px;
-            transition: background 0.3s ease;
-        }
-
-        .back-btn:hover {
-            background: #5a6268;
-        }
-
-        /* Enhanced 2-Step Loading Styles */
-        .loading {
-            display: none;
-            text-align: center;
-            padding: 40px;
-            max-width: 600px;
-            margin: 0 auto;
-        }
-
-        .loading.active {
-            display: block;
-        }
-
-        .loading-container {
-            background: #f8f9fa;
-            border-radius: 20px;
-            padding: 40px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-        }
-
-        .loading-header {
-            margin-bottom: 30px;
-        }
-
-        .loading-header h3 {
-            color: #333;
-            font-size: 1.5rem;
-            margin-bottom: 10px;
-        }
-
-        .loading-header p {
-            color: #666;
-            font-size: 1rem;
-        }
-
-        .step-container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 40px;
-            position: relative;
-        }
-
-        .step-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            flex: 1;
-            position: relative;
-        }
-
-        .step-circle {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            font-weight: bold;
-            margin-bottom: 15px;
-            transition: all 0.3s ease;
-            position: relative;
-            z-index: 2;
-        }
-
-        .step-circle.pending {
-            background: #e9ecef;
-            color: #6c757d;
-            border: 3px solid #dee2e6;
-        }
-
-        .step-circle.active {
-            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-            color: white;
-            border: 3px solid #4facfe;
-            animation: pulse 2s infinite;
-        }
-
-        .step-circle.completed {
-            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
-            color: white;
-            border: 3px solid #43e97b;
-        }
-
-        .step-title {
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 5px;
-            font-size: 1rem;
-        }
-
-        .step-description {
-            color: #666;
-            font-size: 0.9rem;
-            text-align: center;
-            max-width: 120px;
-        }
-
-        .step-connector {
-            position: absolute;
-            top: 30px;
-            left: 50%;
-            right: -50%;
-            height: 4px;
-            background: #e9ecef;
-            z-index: 1;
-        }
-
-        .step-item:last-child .step-connector {
-            display: none;
-        }
-
-        .step-connector.active {
-            background: linear-gradient(90deg, #4facfe 0%, #00f2fe 100%);
-            animation: fillProgress 1s ease-in-out;
-        }
-
-        .step-connector.completed {
-            background: linear-gradient(90deg, #43e97b 0%, #38f9d7 100%);
-        }
-
-        .current-step-info {
-            background: white;
-            border-radius: 15px;
-            padding: 25px;
-            margin-bottom: 20px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-        }
-
-        .current-step-title {
-            font-size: 1.2rem;
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 10px;
-        }
-
-        .current-step-description {
-            color: #666;
-            font-size: 1rem;
-            line-height: 1.5;
-        }
-
-        .spinner {
-            width: 40px;
-            height: 40px;
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #4facfe;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(79, 172, 254, 0.7); }
-            50% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(79, 172, 254, 0); }
-            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(79, 172, 254, 0); }
-        }
-
-        @keyframes fillProgress {
-            0% { width: 0%; }
-            100% { width: 100%; }
-        }
-
-        /* Progress Bar */
-        .progress-bar-container {
-            width: 100%;
-            height: 8px;
-            background: #e9ecef;
-            border-radius: 4px;
-            overflow: hidden;
-            margin-bottom: 20px;
-        }
-
-        .progress-bar {
-            height: 100%;
-            background: linear-gradient(90deg, #4facfe 0%, #00f2fe 100%);
-            transition: width 0.5s ease;
-            border-radius: 4px;
-        }
-
-        /* Collapsible Section */
-        .collapsible-header {
-            background-color: #e9ecef;
-            color: #495057;
-            cursor: pointer;
-            padding: 10px;
-            width: 100%;
-            border: none;
-            text-align: left;
-            outline: none;
-            font-size: 1rem;
-            transition: background-color 0.3s ease;
-            border-radius: 8px;
-            margin-top: 15px;
-            font-weight: 600;
-        }
-
-        .collapsible-header:hover {
-            background-color: #dee2e6;
-        }
-
-        .collapsible-content {
-            padding: 0 10px;
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.2s ease-out;
-            background-color: #f1f3f5;
-            border-radius: 0 0 8px 8px;
-        }
-
-        .collapsible-content pre {
-            white-space: pre-wrap;
-            word-wrap: break-word;
-            font-family: monospace;
-            font-size: 0.9em;
-            color: #343a40;
-            padding: 10px;
-            background-color: #f8f9fa;
-            border-radius: 5px;
-            margin: 10px 0;
-        }
-
-        /* New styles for improved document selection cards */
-        .doc-option-card {
-            background: white; /* Changed to white for a cleaner look, similar to the image background */
-            border-radius: 20px;
-            padding: 30px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-align: center;
-            min-width: 280px; /* Slightly larger cards */
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1); /* Softer shadow */
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: space-between;
-            border: 2px solid transparent; /* For selected state */
-            position: relative; /* For the subtle glow */
-            overflow: hidden; /* To contain glow */
-        }
-
-        .doc-option-card.aadhaar {
-            background: linear-gradient(135deg, #e0f2f7 0%, #c1e7f3 100%); /* Lighter, subtle blue for Aadhaar */
-        }
-
-        .doc-option-card.pan {
-            background: linear-gradient(135deg, #e6f6e6 0%, #c4ebd9 100%); /* Lighter, subtle green for PAN */
-        }
-
-        .doc-option-card:hover {
-            transform: translateY(-8px); /* More pronounced lift */
-            box-shadow: 0 20px 45px rgba(0,0,0,0.2); /* Stronger shadow on hover */
-        }
-
-        .doc-option-card h3 {
-            font-size: 1.8rem; /* Larger title */
-            margin-bottom: 5px;
-            color: #333; /* Darker text for better contrast */
-            font-weight: 700;
-        }
-
-        .doc-option-card p {
-            font-size: 1rem;
-            color: #555;
-            margin-bottom: 20px;
-            font-weight: 500;
-        }
-
-        .card-icon {
-            margin-bottom: 20px;
-        }
-
-        .card-sample-preview {
-            background: linear-gradient(45deg, #4a90e2 0%, #63b3ed 100%); /* Blue gradient for Aadhaar sample */
-            color: white;
-            padding: 15px 20px;
-            border-radius: 10px;
-            width: 90%;
-            font-size: 0.9rem;
-            line-height: 1.5;
-            box-shadow: inset 0 2px 5px rgba(0,0,0,0.2);
-            text-align: left;
-            margin-top: auto; /* Pushes it to the bottom */
-        }
-
-        .doc-option-card.pan .card-sample-preview {
-            background: linear-gradient(45deg, #f5a623 0%, #f7c566 100%); /* Orange gradient for PAN sample */
-        }
-
-        /* Optional: Subtle glowing border on selection */
-        .doc-option-card.selected {
-            border-color: #007bff; /* Blue border for selected */
-            box-shadow: 0 0 0 5px rgba(0, 123, 255, 0.5); /* Blue glow */
-        }
-
-        .doc-option-card.selected.pan {
-            border-color: #28a745; /* Green border for selected PAN */
-            box-shadow: 0 0 0 5px rgba(40, 167, 69, 0.5); /* Green glow */
-        }
-
-        /* Ensure the old .doc-option styles are removed or overridden if they conflict */
-        .doc-option {
-            display: none; /* Hide the old options if you completely replace them */
-        }
-
-        /* Enhancements for data cards in results section */
-        .comparison-cards {
-            gap: 25px; /* Slightly adjusted gap */
-        }
-
-        .data-card {
-            background: #ffffff; /* Pure white background */
-            border-radius: 15px;
-            padding: 30px; /* More padding */
-            border: 1px solid #e0e0e0; /* Softer border */
-            box-shadow: 0 8px 25px rgba(0,0,0,0.08); /* Lighter, more elegant shadow */
-            display: flex;
-            flex-direction: column; /* Stack content vertically */
-        }
-
-        .data-card h4 {
-            font-size: 1.4rem; /* Larger heading */
-            color: #2c3e50; /* Darker, more professional color */
-            margin-bottom: 25px; /* More space below heading */
-            padding-bottom: 15px;
-            border-bottom: 1px solid #f0f0f0; /* Subtle separator */
-            position: relative;
-        }
-
-        /* Optional: Add a subtle underline effect to the h4 */
-        .data-card h4::after {
-            content: '';
-            position: absolute;
-            left: 0;
-            bottom: 0;
-            width: 50px; /* Short underline */
-            height: 3px;
-            background: linear-gradient(90deg, #4facfe 0%, #00f2fe 100%);
-        }
-
-        .data-row {
-            padding: 12px 0; /* More vertical padding */
-            border-bottom: 1px dashed #f5f5f5; /* Dashed separator for softer look */
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start; /* Align items to start for multi-line values */
-            flex-wrap: wrap; /* Allow wrapping on small screens */
-        }
-
-        .data-row:last-child {
-            border-bottom: none;
-        }
-
-        .data-label {
-            font-weight: 700; /* Bolder label */
-            color: #4a5a6a; /* Slightly darker grey for label */
-            flex-basis: 40%; /* Give labels more space */
-            text-align: left;
-        }
-
-        .data-value {
-            color: #34495e; /* Deeper color for value */
-            font-weight: 500;
-            flex-basis: 58%; /* Give values remaining space */
-            text-align: right;
-            word-break: break-word; /* Ensure long values break */
-        }
-
-        /* Icons for verification status */
-        .verification-status.verified .status-icon {
-            color: #28a745; /* Green checkmark */
-        }
-
-        .verification-status.invalid .status-icon {
-            color: #dc3545; /* Red X mark */
-        }
-
-
-        @media (max-width: 768px) {
-            .document-selection {
-                flex-direction: column;
-                gap: 20px;
-            }
-
-            .comparison-cards {
-                grid-template-columns: 1fr;
-            }
-
-            .form-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .step-container {
-                flex-direction: column;
-                gap: 20px;
-            }
-
-            .step-connector {
-                display: none;
-            }
-
-            .loading-container {
-                padding: 20px;
-            }
-        }
-    </style>
+    <title>Document Verification System </title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <div class="logo">
-                <img src="Prasaarlogo.jpg" alt="Prasaar Technologies Logo">
-            </div>
-            <h1>Document Verification System</h1>
-            <p>Secure and Fast Aadhaar & PAN Card Verification</p>
-        </div>
-
-        <div class="main-content">
-            <div id="document-selection" class="document-selection">
-                <div class="doc-option-card aadhaar" onclick="selectDocument('aadhaar')">
-                    <div class="card-icon"><img src="aadhaar_icon.png" alt="Aadhaar Icon" style="width: 80px; height: 80px;"></div>
-                    <h3>Aadhaar Card</h3>
-                    <p>Unique Identification Authority of India</p>
-                    <div class="card-sample-preview">
-                        <p>Name: Sample Name</p>
-                        <p>DOB: 01/01/1990</p>
-                        <p>Gender: Male</p>
-                        <p>XXXX XXXX 1234</p>
-                    </div>
+    <!-- Header Section -->
+    <header class="header">
+        <div class="header-container">
+            <div class="header-left">
+                <div class="logo">
+                    <img src="{{ url_for('static', filename='images/Prasaarlogo.jpg') }}" alt="Prasaar Logo">
                 </div>
-                <div class="doc-option-card pan" onclick="selectDocument('pan')">
-                    <div class="card-icon"><img src="pan_icon.png" alt="PAN Icon" style="width: 80px; height: 80px;"></div>
-                    <h3>PAN Card</h3>
-                    <p>Permanent Account Number</p>
-                    <div class="card-sample-preview">
-                        <p>Name: Sample Name</p>
-                        <p>Father's Name: Father Name</p>
-                        <p>DOB: 01/01/1990</p>
-                        <p>PAN: ABCDE1234F</p>
-                    </div>
-                </div>
-            </div>
-
-            <div id="aadhaar-form" class="verification-form">
-                <div class="form-section">
-                    <h3>📄 Aadhaar Card Verification</h3>
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label for="aadhaar-name">Full Name</label>
-                            <input type="text" id="aadhaar-name" placeholder="Enter your full name" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="aadhaar-dob">Date of Birth</label>
-                            <input type="date" id="aadhaar-dob" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="aadhaar-gender">Gender</label>
-                            <select id="aadhaar-gender" required>
-                                <option value="">Select Gender</option>
-                                <option value="male">Male</option>
-                                <option value="female">Female</option>
-                                <option value="transgender">Transgender</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="form-section">
-                    <h3>📎 Upload Aadhaar Card</h3>
-                    <div class="file-upload">
-                        <input type="file" id="aadhaar-file" accept=".jpg,.jpeg,.png,.pdf" onchange="handleFileUpload('aadhaar')">
-                        <label for="aadhaar-file" id="aadhaar-upload-label">
-                            <div>📤 Click to upload Aadhaar card</div>
-                            <div style="font-size: 0.9rem; color: #666; margin-top: 5px;">Supported formats: JPG, PNG, PDF</div>
-                        </label>
-                    </div>
-                </div>
-
-                <button class="verify-btn" onclick="verifyDocument('aadhaar')">🔍 Verify Aadhaar Card</button>
-                <button class="back-btn" onclick="goBack()">← Back</button>
-            </div>
-
-            <div id="pan-form" class="verification-form">
-                <div class="form-section">
-                    <h3>💳 PAN Card Verification</h3>
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label for="pan-name">Full Name</label>
-                            <input type="text" id="pan-name" placeholder="Enter your full name" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="pan-dob">Date of Birth</label>
-                            <input type="date" id="pan-dob" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="pan-gender">Gender</label>
-                            <select id="pan-gender" required>
-                                <option value="">Select Gender</option>
-                                <option value="male">Male</option>
-                                <option value="female">Female</option>
-                                <option value="transgender">Transgender</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="form-section">
-                    <h3>📎 Upload PAN Card</h3>
-                    <div class="file-upload">
-                        <input type="file" id="pan-file" accept=".jpg,.jpeg,.png,.pdf" onchange="handleFileUpload('pan')">
-                        <label for="pan-file" id="pan-upload-label">
-                            <div>📤 Click to upload PAN card</div>
-                            <div style="font-size: 0.9rem; color: #666; margin-top: 5px;">Supported formats: JPG, PNG, PDF</div>
-                        </label>
-                    </div>
-                </div>
-
-                <button class="verify-btn" onclick="verifyDocument('pan')">🔍 Verify PAN Card</button>
-                <button class="back-btn" onclick="goBack()">← Back</button>
-            </div>
-
-            <div id="loading" class="loading">
-                <div class="loading-container">
-                    <div class="loading-header">
-                        <h3>Processing Your Document</h3>
-                        <p>Please wait while we verify your information securely</p>
-                    </div>
-
-                    <div class="progress-bar-container">
-                        <div class="progress-bar" id="progress-bar"></div>
-                    </div>
-
-                    <div class="step-container">
-                        <div class="step-item">
-                            <div class="step-circle pending" id="step1-circle">
-                                <span>📄</span>
-                            </div>
-                            <div class="step-title">Document Processing</div>
-                            <div class="step-description">Extracting information from your document</div>
-                            <div class="step-connector" id="step1-connector"></div>
-                        </div>
-                        <div class="step-item">
-                            <div class="step-circle pending" id="step2-circle">
-                                <span>🔍</span>
-                            </div>
-                            <div class="step-title">Data Verification</div>
-                            <div class="step-description">Comparing with provided information</div>
-                        </div>
-                    </div>
-
-                    <div class="current-step-info">
-                        <div class="current-step-title" id="current-step-title">Initializing...</div>
-                        <div class="current-step-description" id="current-step-description">Setting up verification process</div>
-                        <div class="spinner" id="loading-spinner"></div>
-                    </div>
-                </div>
-            </div>
-
-            <div id="results" class="results-section">
-                <h3>🔍 Verification Results</h3>
-                
-                <div class="comparison-cards">
-                    <div class="data-card">
-                        <h4>📝 Your Entered Data</h4>
-                        <div id="entered-data">
-                            </div>
-                    </div>
+                <div class="brand-info">
                     
-                    <div class="data-card">
-                        <h4>📄 Extracted Document Data</h4>
-                        <div id="extracted-data">
-                            </div>
-                        <button class="collapsible-header" onclick="toggleCollapsible(this)">Show Raw OCR Text</button>
-                        <div class="collapsible-content">
-                            <pre id="raw-ocr-output"></pre>
+                    <p>Document Verification System</p>
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="visit-info">
+                    <i class="fas fa-globe"></i>
+                    <span>Visit us at <a href="https://prasaar.co" target="_blank">prasaar.co</a></span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-wrapper">
+        <div class="container">
+            <div class="page-header">
+                <h2>Document Verification System</h2>
+                <p>Secure and Fast Aadhaar & PAN Card Verification</p>
+            </div>
+
+            <div class="main-content">
+                <div id="document-selection" class="document-selection">
+                    <div class="doc-option-card aadhaar" onclick="selectDocument('aadhaar')">
+                        <div class="card-icon">
+                            <img src="{{ url_for('static', filename='images/aadhaar_icon.png') }}" alt="Aadhaar Icon">
+                        </div>
+                        <h3>Aadhaar Card</h3>
+                        <p>Unique Identification Authority of India</p>
+                        <div class="card-sample-preview">
+                            <p>Name: Sample Name</p>
+                            <p>DOB: 01/01/1990</p>
+                            <p>Gender: Male</p>
+                            <p>XXXX XXXX 1234</p>
+                        </div>
+                    </div>
+                    <div class="doc-option-card pan" onclick="selectDocument('pan')">
+                        <div class="card-icon">
+                            <img src="{{ url_for('static', filename='images/pan_icon.png') }}" alt="PAN Icon">
+                        </div>
+                        <h3>PAN Card</h3>
+                        <p>Permanent Account Number</p>
+                        <div class="card-sample-preview">
+                            <p>Name: Sample Name</p>
+                            <p>Father's Name: Father Name</p>
+                            <p>DOB: 01/01/1990</p>
+                            <p>PAN: ABCDE1234F</p>
                         </div>
                     </div>
                 </div>
 
-                <div id="verification-status" class="verification-status">
+                <div id="aadhaar-form" class="verification-form">
+                    <div class="form-section">
+                        <h3><i class="fas fa-id-card"></i> Aadhaar Card Verification</h3>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="aadhaar-name">Full Name</label>
+                                <input type="text" id="aadhaar-name" placeholder="Enter your full name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="aadhaar-dob">Date of Birth</label>
+                                <input type="date" id="aadhaar-dob" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="aadhaar-gender">Gender</label>
+                                <select id="aadhaar-gender" required>
+                                    <option value="">Select Gender</option>
+                                    <option value="male">Male</option>
+                                    <option value="female">Female</option>
+                                    <option value="transgender">Transgender</option>
+                                </select>
+                            </div>
+                        </div>
                     </div>
 
-                <button class="back-btn" onclick="startOver()">🔄 Verify Another Document</button>
+                    <div class="form-section">
+                        <h3><i class="fas fa-upload"></i> Upload Aadhaar Card</h3>
+                        <div class="file-upload">
+                            <input type="file" id="aadhaar-file" accept=".jpg,.jpeg,.png,.pdf" onchange="handleFileUpload('aadhaar')">
+                            <label for="aadhaar-file" id="aadhaar-upload-label">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <div>Click to upload Aadhaar card</div>
+                                <div class="file-info">Supported formats: JPG, PNG, PDF</div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button class="verify-btn" onclick="verifyDocument('aadhaar')">
+                            <i class="fas fa-search"></i> Verify Aadhaar Card
+                        </button>
+                        <button class="back-btn" onclick="goBack()">
+                            <i class="fas fa-arrow-left"></i> Back
+                        </button>
+                    </div>
+                </div>
+
+                <div id="pan-form" class="verification-form">
+                    <div class="form-section">
+                        <h3><i class="fas fa-credit-card"></i> PAN Card Verification</h3>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="pan-name">Full Name</label>
+                                <input type="text" id="pan-name" placeholder="Enter your full name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="pan-dob">Date of Birth</label>
+                                <input type="date" id="pan-dob" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="pan-gender">Gender</label>
+                                <select id="pan-gender" required>
+                                    <option value="">Select Gender</option>
+                                    <option value="male">Male</option>
+                                    <option value="female">Female</option>
+                                    <option value="transgender">Transgender</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3><i class="fas fa-upload"></i> Upload PAN Card</h3>
+                        <div class="file-upload">
+                            <input type="file" id="pan-file" accept=".jpg,.jpeg,.png,.pdf" onchange="handleFileUpload('pan')">
+                            <label for="pan-file" id="pan-upload-label">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <div>Click to upload PAN card</div>
+                                <div class="file-info">Supported formats: JPG, PNG, PDF</div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button class="verify-btn" onclick="verifyDocument('pan')">
+                            <i class="fas fa-search"></i> Verify PAN Card
+                        </button>
+                        <button class="back-btn" onclick="goBack()">
+                            <i class="fas fa-arrow-left"></i> Back
+                        </button>
+                    </div>
+                </div>
+
+                <div id="loading" class="loading">
+                    <div class="loading-container">
+                        <div class="loading-header">
+                            <h3>Processing Your Document</h3>
+                            <p>Please wait while we verify your information securely</p>
+                        </div>
+
+                        <div class="progress-bar-container">
+                            <div class="progress-bar" id="progress-bar"></div>
+                        </div>
+
+                        <div class="step-container">
+                            <div class="step-item">
+                                <div class="step-circle pending" id="step1-circle">
+                                    <i class="fas fa-file-alt"></i>
+                                </div>
+                                <div class="step-title">Document Processing</div>
+                                <div class="step-description">Extracting information from your document</div>
+                                <div class="step-connector" id="step1-connector"></div>
+                            </div>
+                            <div class="step-item">
+                                <div class="step-circle pending" id="step2-circle">
+                                    <i class="fas fa-search"></i>
+                                </div>
+                                <div class="step-title">Data Verification</div>
+                                <div class="step-description">Comparing with provided information</div>
+                            </div>
+                        </div>
+
+                        <div class="current-step-info">
+                            <div class="current-step-title" id="current-step-title">Initializing...</div>
+                            <div class="current-step-description" id="current-step-description">Setting up verification process</div>
+                            <div class="spinner" id="loading-spinner"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="results" class="results-section">
+                    <h3><i class="fas fa-search"></i> Verification Results</h3>
+                    
+                    <div class="comparison-cards">
+                        <div class="data-card">
+                            <h4><i class="fas fa-user-edit"></i> Your Entered Data</h4>
+                            <div id="entered-data"></div>
+                        </div>
+                        
+                        <div class="data-card">
+                            <h4><i class="fas fa-file-alt"></i> Extracted Document Data</h4>
+                            <div id="extracted-data"></div>
+                            <button class="collapsible-header" onclick="toggleCollapsible(this)">
+                                <i class="fas fa-eye"></i> Show Raw OCR Text
+                            </button>
+                            <div class="collapsible-content">
+                                <pre id="raw-ocr-output"></pre>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="verification-status" class="verification-status"></div>
+
+                    <div class="results-actions">
+                        <button class="back-btn" onclick="startOver()">
+                            <i class="fas fa-redo"></i> Verify Another Document
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
+    </main>
 
-    <script>
-        let currentDocument = '';
-        let uploadedFile = null;
-        let currentStep = 0;
-
-        function selectDocument(docType) {
-            currentDocument = docType;
-            document.getElementById('document-selection').style.display = 'none';
-            document.getElementById(docType + '-form').classList.add('active');
-        }
-
-        function goBack() {
-            startOver(false);
-        }
-
-        function startOver(hideDocSelection = true) {
-            document.getElementById('results').classList.remove('active');
-            if (hideDocSelection) {
-                document.getElementById('document-selection').style.display = 'flex';
-            }
-            
-            // Reset forms
-            document.getElementById('aadhaar-form').classList.remove('active');
-            document.getElementById('pan-form').classList.remove('active');
-            
-            // Clear form data
-            document.getElementById('aadhaar-name').value = '';
-            document.getElementById('aadhaar-dob').value = '';
-            document.getElementById('aadhaar-gender').value = '';
-            document.getElementById('pan-name').value = '';
-            document.getElementById('pan-dob').value = '';
-            document.getElementById('pan-gender').value = '';
-            
-            // Reset file uploads
-            document.getElementById('aadhaar-file').value = '';
-            document.getElementById('pan-file').value = '';
-            document.getElementById('aadhaar-upload-label').classList.remove('has-file');
-            document.getElementById('pan-upload-label').classList.remove('has-file');
-            document.getElementById('aadhaar-upload-label').innerHTML = '<div>📤 Click to upload Aadhaar card</div><div style="font-size: 0.9rem; color: #666; margin-top: 5px;">Supported formats: JPG, PNG, PDF</div>';
-            document.getElementById('pan-upload-label').innerHTML = '<div>📤 Click to upload PAN card</div><div style="font-size: 0.9rem; color: #666; margin-top: 5px;">Supported formats: JPG, PNG, PDF</div>';
-            
-            uploadedFile = null;
-            currentDocument = '';
-            currentStep = 0;
-
-            // Reset collapsible state
-            const collapsibleHeaders = document.querySelectorAll('.collapsible-header');
-            collapsibleHeaders.forEach(header => {
-                const content = header.nextElementSibling;
-                if (content.style.maxHeight) {
-                    content.style.maxHeight = null;
-                }
-            });
-            document.getElementById('raw-ocr-output').textContent = '';
-            
-            // Reset loading states
-            resetLoadingStates();
-        }
-
-        function resetLoadingStates() {
-            document.getElementById('step1-circle').className = 'step-circle pending';
-            document.getElementById('step2-circle').className = 'step-circle pending';
-            document.getElementById('step1-connector').className = 'step-connector';
-            document.getElementById('progress-bar').style.width = '0%';
-            document.getElementById('current-step-title').textContent = 'Initializing...';
-            document.getElementById('current-step-description').textContent = 'Setting up verification process';
-        }
-
-        function updateLoadingStep(step) {
-            const steps = [
-                {
-                    title: 'Document Processing',
-                    description: 'Scanning and extracting text from your document using OCR technology',
-                    progress: 25
-                },
-                {
-                    title: 'Data Verification',
-                    description: 'Comparing extracted information with your provided details',
-                    progress: 75
-                },
-                {
-                    title: 'Finalizing Results',
-                    description: 'Completing verification and generating results',
-                    progress: 100
-                }
-            ];
-
-            currentStep = step;
-            const stepInfo = steps[step];
-            
-            // Update progress bar
-            document.getElementById('progress-bar').style.width = stepInfo.progress + '%';
-            
-            // Update current step info
-            document.getElementById('current-step-title').textContent = stepInfo.title;
-            document.getElementById('current-step-description').textContent = stepInfo.description;
-            
-            // Update step circles and connectors
-            if (step >= 0) {
-                document.getElementById('step1-circle').className = step === 0 ? 'step-circle active' : 'step-circle completed';
-                document.getElementById('step1-connector').className = step > 0 ? 'step-connector completed' : 'step-connector active';
-            }
-            
-            if (step >= 1) {
-                document.getElementById('step2-circle').className = step === 1 ? 'step-circle active' : 'step-circle completed';
-            }
-        }
-
-        function handleFileUpload(docType) {
-            const fileInput = document.getElementById(docType + '-file');
-            const label = document.getElementById(docType + '-upload-label');
-            
-            if (fileInput.files.length > 0) {
-                uploadedFile = fileInput.files[0];
-                label.classList.add('has-file');
-                label.innerHTML = `<div>✅ ${uploadedFile.name}</div><div style="font-size: 0.9rem; color: #666; margin-top: 5px;">File uploaded successfully</div>`;
-            } else {
-                uploadedFile = null;
-                label.classList.remove('has-file');
-                label.innerHTML = `<div>📤 Click to upload ${docType} card</div><div style="font-size: 0.9rem; color: #666; margin-top: 5px;">Supported formats: JPG, PNG, PDF</div>`;
-            }
-        }
-
-        function toggleCollapsible(button) {
-            button.classList.toggle('active');
-            const content = button.nextElementSibling;
-            if (content.style.maxHeight) {
-                content.style.maxHeight = null;
-            } else {
-                content.style.maxHeight = content.scrollHeight + "px";
-            } 
-        }
-
-        async function verifyDocument(docType) {
-            const name = document.getElementById(docType + '-name').value;
-            const dob = document.getElementById(docType + '-dob').value;
-            const gender = document.getElementById(docType + '-gender').value;
-            
-            if (!name || !dob || !gender || !uploadedFile) {
-                alert('Please fill all fields and upload a document.');
-                return;
-            }
-
-            document.getElementById(docType + '-form').classList.remove('active');
-            document.getElementById('loading').classList.add('active');
-            
-            // Reset loading states
-            resetLoadingStates();
-
-            // Simulate 2-step verification process
-            setTimeout(() => updateLoadingStep(0), 500);
-            setTimeout(() => updateLoadingStep(1), 3000);
-
-            const formData = new FormData();
-            formData.append('document', uploadedFile);
-            formData.append('docType', docType);
-            formData.append('name', name);
-            formData.append('dob', dob);
-            formData.append('gender', gender);
-
-            try {
-                // Point this to your Flask endpoint
-                const response = await fetch('/verify-document', {
-                    method: 'POST',
-                    body: formData
-                });
-
-                const data = await response.json();
-                console.log('Backend response:', data);
-
-                // Complete the loading process
-                setTimeout(() => updateLoadingStep(2), 4500);
+    <!-- Footer Section -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4><i class="fas fa-envelope"></i> Contact</h4>
+                    <div class="footer-item">
+                        <i class="fas fa-envelope"></i>
+                        <span>Email: <a href="mailto:ashok@prasaar.co">ashok@prasaar.co</a></span>
+                    </div>
+                    <div class="footer-item">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span>Office 615, Fortuna Business Center, Pimple Saudagar, Pune - 411025</span>
+                    </div>
+                </div>
                 
-                // Show results after a brief delay
-                setTimeout(() => {
-                    document.getElementById('loading').classList.remove('active');
-                    document.getElementById('results').classList.add('active');
+                <div class="footer-section">
+                    <h4><i class="fas fa-info-circle"></i> About Us</h4>
+                    <p>We help businesses connect with customers effortlessly through WhatsApp, combining automation and real-time interactions to enhance engagement, trust, and revenue.</p>
+                    <div class="footer-link">
+                        <a href="https://prasaar.co" target="_blank">
+                            <i class="fas fa-external-link-alt"></i> Visit prasaar.co
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2024 Prasaar. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
 
-                    // Populate entered data
-                    const enteredDataHtml = `
-                        <div class="data-row">
-                            <span class="data-label">Name:</span>
-                            <span class="data-value">${data.entered_data.name}</span>
-                        </div>
-                        <div class="data-row">
-                            <span class="data-label">Date of Birth:</span>
-                            <span class="data-value">${data.entered_data.dob}</span>
-                        </div>
-                        <div class="data-row">
-                            <span class="data-label">Gender:</span>
-                            <span class="data-value">${data.entered_data.gender.charAt(0).toUpperCase() + data.entered_data.gender.slice(1)}</span>
-                        </div>
-                    `;
-                    document.getElementById('entered-data').innerHTML = enteredDataHtml;
-
-                    // Populate extracted data
-                    let extractedDataHtml = '';
-                    if (data.extracted_data && !data.extracted_data.error) {
-                        for (const [key, value] of Object.entries(data.extracted_data)) {
-                            // Skip if value is null or undefined for display purposes
-                            if (value === null || value === undefined) continue; 
-                            
-                            // Format keys nicely (e.g., 'pan_number' -> 'PAN Number', 'aadhaar_linked' -> 'Aadhaar Linked')
-                            let formattedKey = key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
-                            
-                            // Format boolean for display (true/false to Yes/No)
-                            let displayValue = value;
-                            if (typeof value === 'boolean') {
-                                displayValue = value ? 'Yes' : 'No';
-                            }
-
-                            extractedDataHtml += `
-                                <div class="data-row">
-                                    <span class="data-label">${formattedKey}:</span>
-                                    <span class="data-value">${displayValue}</span>
-                                </div>
-                            `;
-                        }
-                    } else {
-                        extractedDataHtml = `<div class="data-row"><span class="data-value" style="color: red;">Error: ${data.extracted_data ? data.extracted_data.error : 'Unknown error during extraction'}</span></div>`;
-                    }
-                    document.getElementById('extracted-data').innerHTML = extractedDataHtml;
-
-                    // Populate Raw OCR Text
-                    document.getElementById('raw-ocr-output').textContent = data.raw_ocr_text || "No raw text extracted or provided.";
-
-                    // Determine verification status
-                    const statusDiv = document.getElementById('verification-status');
-                    if (data.is_verified) {
-                        statusDiv.className = 'verification-status verified';
-                        statusDiv.innerHTML = `
-                            <div class="status-icon">✅</div>
-                            <div>Document Successfully Verified!</div>
-                            <div style="font-size: 0.9rem; margin-top: 10px;">${data.status_message}</div>
-                        `;
-                    } else {
-                        statusDiv.className = 'verification-status invalid';
-                        statusDiv.innerHTML = `
-                            <div class="status-icon">❌</div>
-                            <div>Document Verification Failed</div>
-                            <div style="font-size: 0.9rem; margin-top: 10px;">${data.status_message}</div>
-                        `;
-                    }
-                }, 5500);
-
-            } catch (error) {
-                console.error('Error during verification:', error);
-                
-                setTimeout(() => {
-                    document.getElementById('loading').classList.remove('active');
-                    document.getElementById('results').classList.add('active');
-                    document.getElementById('verification-status').className = 'verification-status invalid';
-                    document.getElementById('verification-status').innerHTML = `
-                        <div class="status-icon">❗</div>
-                        <div>An unexpected error occurred.</div>
-                        <div style="font-size: 0.9rem; margin-top: 10px;">Please check the console for details and try again.</div>
-                    `;
-                }, 2000);
-            }
-        }
-    </script>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 </body>
 </html>
