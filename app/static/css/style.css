@@ -72,7 +72,7 @@ body {
     align-items: center;
     gap: 0.5rem;
     padding: 0.75rem 1.5rem;
-    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+    background: linear-gradient(135deg, rgb(198, 2, 64) 0%, rgb(198, 2, 64) 100%);
     color: white;
     border-radius: 12px;
     font-weight: 500;
@@ -109,6 +109,16 @@ body {
     margin-bottom: 3rem;
     color: white;
 }
+
+.page-header .highlight {
+    background: none !important;
+    -webkit-background-clip: unset !important;
+    -webkit-text-fill-color: rgb(248, 39, 39) !important;
+    background-clip: unset !important;
+    color: rgb(202, 64, 64) !important;
+}
+
+
 
 .page-header h2 {
     font-size: 3rem;
@@ -812,7 +822,7 @@ body {
 }
 
 .footer-section h4 i {
-    color: #dc2626;
+    color: rgb(198, 2, 64);
 }
 
 .footer-item {
@@ -824,7 +834,7 @@ body {
 }
 
 .footer-item i {
-    color: #dc2626;
+    color: rgb(198, 2, 64);
     margin-top: 0.25rem;
     min-width: 16px;
 }
@@ -846,7 +856,7 @@ body {
 }
 
 .footer-link a {
-    color: #dc2626;
+    color: rgb(198, 2, 64);
     text-decoration: none;
     font-weight: 500;
     display: inline-flex;
@@ -856,7 +866,7 @@ body {
 }
 
 .footer-link a:hover {
-    color: #b91c1c;
+    color: rgb(198, 2, 64);
 }
 
 .footer-bottom {
@@ -948,4 +958,20 @@ body {
 @keyframes fadeIn {
     from { opacity: 0; }
     to { opacity: 1; }
+}
+
+.card-select-btn {
+    margin-top: 1rem;
+    padding: 0.6rem 1.2rem;
+    background-color: rgb(198, 2, 64); /* Tailwind blue-600 */
+    color: white;
+    border: none;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.card-select-btn:hover {
+    background-color: rgb(198, 2, 64); /* Tailwind blue-700 */
 }

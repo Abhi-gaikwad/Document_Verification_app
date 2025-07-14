@@ -33,38 +33,47 @@
     <main class="main-wrapper">
         <div class="container">
             <div class="page-header">
-                <h2>Document Verification System</h2>
+                <h2>Document <span class="highlight">Verification</span> System</h2>
                 <p>Secure and Fast Aadhaar & PAN Card Verification</p>
             </div>
 
+
             <div class="main-content">
                 <div id="document-selection" class="document-selection">
-                    <div class="doc-option-card aadhaar" onclick="selectDocument('aadhaar')">
+                    <div class="doc-option-card aadhaar">
                         <div class="card-icon">
                             <img src="{{ url_for('static', filename='images/aadhaar_icon.png') }}" alt="Aadhaar Icon">
                         </div>
                         <h3>Aadhaar Card</h3>
                         <p>Unique Identification Authority of India</p>
                         <div class="card-sample-preview">
-                            <p>Name:Narendra Damodardas Modi</p>
+                            <p>Name: Arjun Ajay Deshmukh</p>
                             <p>DOB: 17/09/1950</p>
                             <p>Gender: Male</p>
                             <p>XXXX XXXX 8934</p>
                         </div>
+                        <button class="card-select-btn" onclick="selectDocument('aadhaar')">
+                            Select Aadhaar Card
+                        </button>
                     </div>
-                    <div class="doc-option-card pan" onclick="selectDocument('pan')">
+
+                    <div class="doc-option-card pan">
                         <div class="card-icon">
                             <img src="{{ url_for('static', filename='images/pan_icon.png') }}" alt="PAN Icon">
                         </div>
                         <h3>PAN Card</h3>
                         <p>Permanent Account Number</p>
                         <div class="card-sample-preview">
-                            <p>Name: Narendra Damodardas Modi</p>
-                            <p>Father's Name: Damodardas Mulchand Modi</p>
+                            <p>Name: Arjun Ajay Deshmukh</p>
+                            <p>Father's Name: Ajay Rajaram Deshmukh</p>
                             <p>DOB: 17/09/1950</p>
-                            <p>PAN: SQE1234F</p>
+                            <p>PAN: XXXX1234F</p>
                         </div>
+                        <button class="card-select-btn" onclick="selectDocument('pan')">
+                            Select PAN Card
+                        </button>
                     </div>
+
                 </div>
 
                 <div id="aadhaar-form" class="verification-form">
@@ -261,7 +270,7 @@
             </div>
             
             <div class="footer-bottom">
-                <p>&copy; 2024 Prasaar. All rights reserved.</p>
+                <p>&copy; 2025 Prasaar. All rights reserved.</p>
             </div>
         </div>
     </footer>
