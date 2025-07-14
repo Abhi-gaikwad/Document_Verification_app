@@ -113,7 +113,7 @@ body {
 .page-header .highlight {
     background: none !important;
     -webkit-background-clip: unset !important;
-    -webkit-text-fill-color: rgb(248, 39, 39) !important;
+    -webkit-text-fill-color: rgb(95, 209, 66) !important;
     background-clip: unset !important;
     color: rgb(202, 64, 64) !important;
 }
