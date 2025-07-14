@@ -1,6 +1,8 @@
 from flask import Flask, render_template, request, jsonify
 import os
 from werkzeug.utils import secure_filename
+from app.config import MAINTENANCE_MODE
+
 # Correct import path based on your folder structure
 from app.verification.pan_verifier import extract_pan_data
 from app.verification.aadhaar_verifier import extract_aadhaar_data # Import aadhaar verifier
@@ -16,13 +18,19 @@ if not os.path.exists(app.config['UPLOAD_FOLDER']):
 @app.route('/')
 def index():
     """Renders the main index page."""
+    if MAINTENANCE_MODE:
+        return render_template('maintenance.html')
     return render_template('index.html')
+
 
 @app.route('/verify-document', methods=['POST'])
 def verify_document():
     """
     Handles document verification requests (PAN or Aadhaar).
     """
+    if MAINTENANCE_MODE:
+        return jsonify({"error": "Service temporarily unavailable due to maintenance."}), 503
+    
     if 'document' not in request.files:
         return jsonify({"error": "No document file provided"}), 400
 
