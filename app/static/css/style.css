@@ -92,6 +92,41 @@ body {
     font-weight: 600;
 }
 
+.visit-info {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background-color: #2563eb; /* blue-600 */
+    color: white;
+    padding: 10px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 15px;
+}
+
+.visit-info:hover {
+    background-color: #1e40af; /* blue-800 */
+}
+
+.visit-info:active {
+    background-color: #1e3a8a; /* blue-900 */
+}
+
+.visit-info i {
+    font-size: 16px;
+}
+
+.visit-info a {
+    color: white;
+    text-decoration: none;
+}
+
+.visit-info a:hover {
+    text-decoration: underline;
+}
 /* Main Content Container */
 .main-wrapper {
     padding: 2rem 0;
